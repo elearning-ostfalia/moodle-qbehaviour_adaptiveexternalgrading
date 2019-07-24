@@ -20,10 +20,8 @@
  * @package    qbehaviour_adaptiveexternalgrading
  * @copyright  2019 Ostfalia Hochschule fuer angewandte Wissenschaften
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @author     K.Borm <k.borm[at]ostfalia.de> 
+ * @author     K.Borm <k.borm[at]ostfalia.de>
  */
-
-
 
 defined('MOODLE_INTERNAL') || die();
 define('PRECHECK', true);
@@ -42,8 +40,7 @@ class qbehaviour_adaptiveexternalgrading extends qbehaviour_adaptive {
     public $showsubmit = true;
     public $showcompile = false;
 
-    public function __construct(question_attempt $qa, $preferredbehaviour)
-    {
+    public function __construct(question_attempt $qa, $preferredbehaviour) {
         parent::__construct($qa, $preferredbehaviour);
 
         if (!is_string($preferredbehaviour)) {
@@ -54,8 +51,9 @@ class qbehaviour_adaptiveexternalgrading extends qbehaviour_adaptive {
             if (!is_null($preferredbehaviour)) {
                 if (get_class($preferredbehaviour) == "qbehaviour_adaptiveexternalgrading") {
                     $this->nopenalty = $preferredbehaviour->nopenalty;
-                } else
+                } else {
                     throw new coding_exception("preferredbehaviour is not a string, instead: " . get_class($preferredbehaviour));
+                }
             } else {
                 // happens if teacher calls question review =>
                 // do not throw an exception!
@@ -64,7 +62,7 @@ class qbehaviour_adaptiveexternalgrading extends qbehaviour_adaptive {
             }
         } else {
             // try and guess what behaviour may use multiple tries
-            switch($preferredbehaviour) {
+            switch ($preferredbehaviour) {
                 case 'interactive':
                 case 'adaptive':
                     // these behaviours use penalty for wrong responses
@@ -87,14 +85,12 @@ class qbehaviour_adaptiveexternalgrading extends qbehaviour_adaptive {
 
     }
 
-
     // TODO??
     public function is_compatible_question(question_definition $question) {
         return $question instanceof question_automatically_gradable;
     }
 
-
-	private function get_result_from_grader($response, question_attempt_pending_step $pendingstep) {
+    private function get_result_from_grader($response, question_attempt_pending_step $pendingstep) {
         // $response = $pendingstep->get_qt_data();
 
         $gradedata = $this->question->grade_response($response);
@@ -105,9 +101,6 @@ class qbehaviour_adaptiveexternalgrading extends qbehaviour_adaptive {
         }
         return $gradedata;
     }
-
-
-
 
     public function process_submit(question_attempt_pending_step $pendingstep, $compile = false) {
         $status = $this->process_save($pendingstep);
@@ -125,11 +118,13 @@ class qbehaviour_adaptiveexternalgrading extends qbehaviour_adaptive {
         $prevresponse = $prevstep->get_qt_data();
         $prevtries = $this->qa->get_last_behaviour_var('_try', 0);
         $prevbest = $pendingstep->get_fraction();
-        // ORIGINAL should be removed:
-        //        if (is_null($prevbest)) {
-        //            $prevbest = 0;
-        //        }
-        // => do not set grade to 0 if there is no actual grading available!!
+        /*
+        ORIGINAL should be removed:
+                if (is_null($prevbest)) {
+                    $prevbest = 0;
+                }
+        => do not set grade to 0 if there is no actual grading available!!
+        */
 
         if ($this->question->is_same_response($response, $prevresponse)) {
             return question_attempt::DISCARD;
@@ -144,19 +139,20 @@ class qbehaviour_adaptiveexternalgrading extends qbehaviour_adaptive {
             // problems in grader =>
             // - do not switch to todo state
             // - do not count as try! => no penalty for invalid submissions/technical problems
-            $pendingstep->set_state(question_state::$invalid); //+
-            if (is_null($fraction)) // +
-                $pendingstep->set_fraction($fraction); // +
+            $pendingstep->set_state(question_state::$invalid); // +
+            if (is_null($fraction)) {// +
+                $pendingstep->set_fraction($fraction);
+            } // +
             // - keep step
-            return question_attempt::KEEP; //+
+            return question_attempt::KEEP; // +
         } // +
 
-
         // do not convert null to 0, keep null
-        if (!is_null($prevbest) && !is_null($fraction)) // +
+        if (!is_null($prevbest) && !is_null($fraction)) { // +
             $pendingstep->set_fraction(max($prevbest, $this->adjusted_fraction($fraction, $prevtries)));
-        else // +
-            $pendingstep->set_fraction($this->adjusted_fraction($fraction, $prevtries)); // +
+        } else {// +
+            $pendingstep->set_fraction($this->adjusted_fraction($fraction, $prevtries));
+        } // +
 
         if ($prevstep->get_state() == question_state::$complete) {
             $pendingstep->set_state(question_state::$complete);
@@ -172,7 +168,6 @@ class qbehaviour_adaptiveexternalgrading extends qbehaviour_adaptive {
         return question_attempt::KEEP;
     }
 
-
     public function process_finish(question_attempt_pending_step $pendingstep) {
         if ($this->qa->get_state()->is_finished()) {
             return question_attempt::DISCARD;
@@ -180,11 +175,13 @@ class qbehaviour_adaptiveexternalgrading extends qbehaviour_adaptive {
 
         $prevtries = $this->qa->get_last_behaviour_var('_try', 0);
         $prevbest = $this->qa->get_fraction();
-// ORIGINAL should be removed:
-//        if (is_null($prevbest)) {
-//            $prevbest = 0;
-//        }
-// => do not set grade to 0 if there is no actual grading available!!
+        /*
+        // ORIGINAL should be removed:
+        //        if (is_null($prevbest)) {
+        //            $prevbest = 0;
+        //        }
+        // => do not set grade to 0 if there is no actual grading available!!
+        */
 
         $laststep = $this->qa->get_last_step();
         // ++
@@ -194,12 +191,11 @@ class qbehaviour_adaptiveexternalgrading extends qbehaviour_adaptive {
             case question_state::$invalid:
             case question_state::$needsgrading:
                 break;
-            //case question_state::$todo: // might be converted from gradedwrong
+            // case question_state::$todo: // might be converted from gradedwrong
             default:
                 $nograding = $laststep->has_behaviour_var('_rawfraction');
                 break;
         }
-
 
         $response = $laststep->get_qt_data();
         if (!$this->question->is_gradable_response($response)) {
@@ -218,14 +214,16 @@ class qbehaviour_adaptiveexternalgrading extends qbehaviour_adaptive {
                 // generate state and fraction from last step values
                 $fraction = $laststep->get_behaviour_var('_rawfraction');
                 $state = $laststep->get_state();
-                if ($state == question_state::$complete && $fraction == 1.0)
+                if ($state == question_state::$complete && $fraction == 1.0) {
                     $state = question_state::$gradedright;
-                        // fall through!
+                }
+                // fall through!
                 if ($state == question_state::$todo || $state == question_state::$complete) {
-                    if ($fraction == 0.0)
+                    if ($fraction == 0.0) {
                         $state = question_state::$gradedwrong;
-                    else if ($fraction != null)
+                    } else if ($fraction != null) {
                         $state = question_state::$gradedpartial;
+                    }
                 }
 
             } else {
@@ -239,15 +237,14 @@ class qbehaviour_adaptiveexternalgrading extends qbehaviour_adaptive {
         }
 
         $pendingstep->set_state($state);
-        if (!is_null($prevbest) && !is_null($fraction)) // +
+        if (!is_null($prevbest) && !is_null($fraction)) { // +
             $pendingstep->set_fraction(max($prevbest, $this->adjusted_fraction($fraction, $prevtries)));
-        else // +
-            $pendingstep->set_fraction($this->adjusted_fraction($fraction, $prevtries)); // +
+        } else {// +
+            $pendingstep->set_fraction($this->adjusted_fraction($fraction, $prevtries));
+        } // +
 
         return question_attempt::KEEP;
-
     }
-
 
     // +
     protected function adjusted_fraction($fraction, $prevtries) {
@@ -260,11 +257,11 @@ class qbehaviour_adaptiveexternalgrading extends qbehaviour_adaptive {
                 $this->nopenalty = false;
             }
         }
-//            throw new coding_exception("nopenalty is not set");
+        // throw new coding_exception("nopenalty is not set");
 
-        if ($this->nopenalty)
+        if ($this->nopenalty) {
             return $fraction;
-        else {
+        } else {
             if (!is_null($fraction)) {
                 return parent::adjusted_fraction($fraction, $prevtries);
             } else {
@@ -288,6 +285,5 @@ class qbehaviour_adaptiveexternalgrading extends qbehaviour_adaptive {
 
         return parent::get_state_string($showcorrectness);
     }
-
 
 }

@@ -20,7 +20,7 @@
  * @package    qbehaviour_adaptiveexternalgrading
  * @copyright  2019 Ostfalia Hochschule fuer angewandte Wissenschaften
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @author     K.Borm <k.borm[at]ostfalia.de> 
+ * @author     K.Borm <k.borm[at]ostfalia.de>
  */
 defined('MOODLE_INTERNAL') || die();
 
@@ -35,29 +35,29 @@ require_once($CFG->dirroot . '/question/behaviour/adaptive/renderer.php');
  * @copyright  2019 Ostfalia Hochschule fuer angewandte Wissenschaften
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class qbehaviour_adaptiveexternalgrading_renderer extends qbehaviour_adaptive_renderer
-{
+class qbehaviour_adaptiveexternalgrading_renderer extends qbehaviour_adaptive_renderer {
     private $nopenalty = false;
 
     public function controls(question_attempt $qa, question_display_options $options) {
         $behaviour = $qa->get_behaviour();
-        if (get_class($behaviour) != "qbehaviour_adaptiveexternalgrading")
+        if (get_class($behaviour) != "qbehaviour_adaptiveexternalgrading") {
             throw new coding_exception("unexpected behaviour: " . $behaviour);
+        }
 
         if ($behaviour->showsubmit) {
             return $this->submit_button($qa, $options);
-        }
-        else
+        } else {
             return '';
+        }
     }
-
 
     public function feedback(question_attempt $qa, question_display_options $options) {
 
         // remember use of penalty from attempt behaviour
         $behaviour = $qa->get_behaviour();
-        if (get_class($behaviour) != "qbehaviour_adaptiveexternalgrading")
+        if (get_class($behaviour) != "qbehaviour_adaptiveexternalgrading") {
             throw new coding_exception("unexpected behaviour: " . $behaviour);
+        }
 
         $this->nopenalty = $behaviour->nopenalty;
 
@@ -70,14 +70,13 @@ class qbehaviour_adaptiveexternalgrading_renderer extends qbehaviour_adaptive_re
             case question_state::$needsgrading:
                 return html_writer::nonempty_tag('div',
                         get_string('gradeinternalerror', 'qbehaviour_adaptiveexternalgrading'),
-                    array('class' => 'gradingdetails'));
+                        array('class' => 'gradingdetails'));
         }
 
         // Otherwise get the details.
         return $this->render_adaptive_marks(
-            $qa->get_behaviour()->get_adaptive_marks(), $options);
+                $qa->get_behaviour()->get_adaptive_marks(), $options);
     }
-
 
     protected function grading_details(qbehaviour_adaptive_mark_details $details, question_display_options $options) {
         if ($this->nopenalty) {
@@ -89,9 +88,10 @@ class qbehaviour_adaptiveexternalgrading_renderer extends qbehaviour_adaptive_re
     }
 
     protected function disregarded_info() {
-        if ($this->nopenalty)
+        if ($this->nopenalty) {
             return '';
-        else
+        } else {
             return parent::disregarded_info();
+        }
     }
 }

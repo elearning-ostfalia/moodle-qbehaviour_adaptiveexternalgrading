@@ -18,16 +18,17 @@
  * @package    qbehaviour_adaptiveexternalgrading
  * @copyright  2019 Ostfalia Hochschule fuer angewandte Wissenschaften
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @author     K.Borm <k.borm[at]ostfalia.de> 
+ * @author     K.Borm <k.borm[at]ostfalia.de>
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version  = 2019061201;
+$plugin->version = 2019072400;
 $plugin->requires = 2016120503;
 $plugin->cron = 0;
 $plugin->component = 'qbehaviour_adaptiveexternalgrading';
 $plugin->maturity = MATURITY_STABLE;
-$plugin->release = '0.9.3';
+$plugin->release = '0.9.4';
 
 $plugin->dependencies = array();
+

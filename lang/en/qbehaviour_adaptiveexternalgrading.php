@@ -20,9 +20,9 @@
  * @package    qbehaviour_adaptiveexternalgrading
  * @copyright  2019 Ostfalia Hochschule fuer angewandte Wissenschaften
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @author     K.Borm <k.borm[at]ostfalia.de> 
+ * @author     K.Borm <k.borm[at]ostfalia.de>
  */
 
 $string['pluginname'] = 'Adaptive for external grading';
-//$string['compile'] = 'Compile';
+// $string['compile'] = 'Compile';
 $string['gradeinternalerror'] = 'The submission could not be graded due to an internal error in the grading system.';

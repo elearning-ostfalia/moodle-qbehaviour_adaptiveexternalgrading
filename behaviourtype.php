@@ -20,9 +20,8 @@
  * @package    qbehaviour_adaptiveexternalgrading
  * @copyright  2019 Ostfalia Hochschule fuer angewandte Wissenschaften
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @author     K.Borm <k.borm[at]ostfalia.de> 
+ * @author     K.Borm <k.borm[at]ostfalia.de>
  */
-
 
 defined('MOODLE_INTERNAL') || die();
 
