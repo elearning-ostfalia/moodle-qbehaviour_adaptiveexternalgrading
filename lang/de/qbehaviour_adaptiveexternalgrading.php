@@ -23,7 +23,7 @@
  * @author     K.Borm <k.borm[at]ostfalia.de>
  */
 
-$string['pluginname'] = 'Adaptive for external grading';
+$string['pluginname'] = 'Mehrfachbeantwortung für externe Bewerter';
 // $string['compile'] = 'Kompilieren';
 $string['gradeinternalerror'] = 'Die Antwort konnte aufgrund eines internen Fehlers im Bewertungssystem nicht bewertet werden.';
-
+$string['privacy:metadata'] = 'Das Plugin \'Frageverhalten Mehrfachbeantwortung für externe Bewerter\' speichert keine personenbezogenen Daten.';

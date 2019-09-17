@@ -26,3 +26,4 @@
 $string['pluginname'] = 'Adaptive for external grading';
 // $string['compile'] = 'Compile';
 $string['gradeinternalerror'] = 'The submission could not be graded due to an internal error in the grading system.';
+$string['privacy:metadata'] = 'The Adaptive for external grading mode question behaviour plugin does not store any personal data.';

@@ -15,20 +15,33 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package    qbehaviour_adaptiveexternalgrading
+ * Privacy Subsystem implementation for qformat_proforma.
+ *
+ * @package    qformat_proforma
  * @copyright  2019 Ostfalia Hochschule fuer angewandte Wissenschaften
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author     K.Borm <k.borm[at]ostfalia.de>
  */
 
+namespace qbehaviour_adaptiveexternalgrading\privacy;
+
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 2019091700;
-$plugin->requires = 2016120503;
-$plugin->cron = 0;
-$plugin->component = 'qbehaviour_adaptiveexternalgrading';
-$plugin->maturity = MATURITY_STABLE;
-$plugin->release = '0.9.5';
+/**
+ * Privacy Subsystem for qbehaviour__adaptiveexternalgrading implementing null_provider.
+ *
+ * @copyright  2019 Ostfalia Hochschule fuer angewandte Wissenschaften
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class provider implements \core_privacy\local\metadata\null_provider {
 
-$plugin->dependencies = array();
-
+    /**
+     * Get the language string identifier with the component's language
+     * file to explain why this plugin stores no data.
+     *
+     * @return  string
+     */
+    public static function get_reason() : string {
+        return 'privacy:metadata';
+    }
+}
