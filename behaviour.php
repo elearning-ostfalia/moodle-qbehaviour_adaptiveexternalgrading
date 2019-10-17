@@ -102,6 +102,19 @@ class qbehaviour_adaptiveexternalgrading extends qbehaviour_adaptive {
         return $gradedata;
     }
 
+    // we set fraction to null:
+    // scenario to handle:
+    // - right answer with fraction 1
+    // - new answer => unknown result
+    public function process_save(question_attempt_pending_step $pendingstep) {
+        $status = parent::process_save($pendingstep);
+        // + set fraction to null because we need new grading
+        // + in case of a new response
+        $pendingstep->set_fraction(null);
+        return $status;
+    }
+
+
     public function process_submit(question_attempt_pending_step $pendingstep, $compile = false) {
         $status = $this->process_save($pendingstep);
 
@@ -263,7 +276,8 @@ class qbehaviour_adaptiveexternalgrading extends qbehaviour_adaptive {
             return $fraction;
         } else {
             if (!is_null($fraction)) {
-                return parent::adjusted_fraction($fraction, $prevtries);
+                // + if adjusted fraction is negative than it is set to 0
+                return max(0, parent::adjusted_fraction($fraction, $prevtries));
             } else {
                 // ???
                 return $fraction;
@@ -285,5 +299,4 @@ class qbehaviour_adaptiveexternalgrading extends qbehaviour_adaptive {
 
         return parent::get_state_string($showcorrectness);
     }
-
 }
