@@ -40,17 +40,25 @@ class qbehaviour_adaptiveexternalgrading extends qbehaviour_adaptive {
     public $showsubmit = true;
     public $showcompile = false;
 
-    public function __construct(question_attempt $qa, $preferredbehaviour) {
-        parent::__construct($qa, $preferredbehaviour);
+    protected $preferred = null;
 
+    public function __construct(question_attempt $qa, $preferredbehaviour) {
+        if ($preferredbehaviour == 'deferredcbm' || $preferredbehaviour == 'immediatecbm') {
+            throw new moodle_exception('proforma questions are not compatible with cbm behaviour');
+        }
+
+        parent::__construct($qa, $preferredbehaviour);
+        $this->preferred = $preferredbehaviour;
         if (!is_string($preferredbehaviour)) {
-            // happens if teacher calls question review
-            // => set dummy value
+            // happens if teacher calls question review => set dummy value
             $this->nopenalty = true;
 
             if (!is_null($preferredbehaviour)) {
                 if (get_class($preferredbehaviour) == "qbehaviour_adaptiveexternalgrading") {
                     $this->nopenalty = $preferredbehaviour->nopenalty;
+                    $this->preferred = $preferredbehaviour->preferred;
+                } else if (is_a($preferredbehaviour, 'question_behaviour')) {
+                    $this->preferred = $preferredbehaviour->get_name();
                 } else {
                     throw new coding_exception("preferredbehaviour is not a string, instead: " . get_class($preferredbehaviour));
                 }
@@ -73,6 +81,7 @@ class qbehaviour_adaptiveexternalgrading extends qbehaviour_adaptive {
                     $this->nopenalty = true;
                     break;
                 case 'deferredfeedback':
+                case 'deferredcbm':
                     $this->nopenalty = true;
                     $this->showsubmit = false;
                     break;
@@ -87,7 +96,7 @@ class qbehaviour_adaptiveexternalgrading extends qbehaviour_adaptive {
 
     // TODO??
     public function is_compatible_question(question_definition $question) {
-        return $question instanceof question_automatically_gradable;
+        return $question instanceof qtype_proforma_question;
     }
 
     private function get_result_from_grader($response, question_attempt_pending_step $pendingstep) {
@@ -107,7 +116,13 @@ class qbehaviour_adaptiveexternalgrading extends qbehaviour_adaptive {
     // - right answer with fraction 1
     // - new answer => unknown result
     public function process_save(question_attempt_pending_step $pendingstep) {
-        $status = parent::process_save($pendingstep);
+        if ($this->isdeferred()) {
+            $status = question_behaviour_with_save::process_save($pendingstep);
+
+        } else {
+            $status = parent::process_save($pendingstep);
+        }
+
         // + set fraction to null because we need new grading
         // + in case of a new response
         $pendingstep->set_fraction(null);
@@ -287,6 +302,7 @@ class qbehaviour_adaptiveexternalgrading extends qbehaviour_adaptive {
 
     // +
     public function get_state_string($showcorrectness) {
+        // Modify behaviour for try:
         $laststep = $this->qa->get_last_step();
         if ($laststep->has_behaviour_var('_try')) {
             if (is_null($laststep->get_behaviour_var('_rawfraction'))) {
@@ -295,8 +311,35 @@ class qbehaviour_adaptiveexternalgrading extends qbehaviour_adaptive {
                 $state = $laststep->get_state();
                 return $state->default_string(true);
             }
+            return parent::get_state_string($showcorrectness);
         }
 
+        if ($this->isdeferred()) {
+            // Special treatment for deferred behaviour scenarios:
+            // In case of no input the state string from
+            // the deferred behaviour shall be used to be compliant with other question types.
+            $state = $this->qa->get_state();
+            if ($state == question_state::$todo) {
+                return question_behaviour_with_save::get_state_string($showcorrectness);
+            }
+        }
         return parent::get_state_string($showcorrectness);
+    }
+
+    /**
+     * returns true if the preferred behaviour is a deferred one so that
+     * the grader need not to be executed as soon as possible.
+     * @return bool
+     */
+    protected function isdeferred() : bool {
+        if (!isset($this->preferred)) {
+            return false;
+        }
+        switch ($this->preferred) {
+            case 'deferredfeedback':
+            case 'deferredcbm':
+                return true;
+        }
+        return false;
     }
 }

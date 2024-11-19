@@ -23,12 +23,12 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 2019101700;
+$plugin->version = 2024111200;
 $plugin->requires = 2016120503;
 $plugin->cron = 0;
 $plugin->component = 'qbehaviour_adaptiveexternalgrading';
 $plugin->maturity = MATURITY_STABLE;
-$plugin->release = '0.9.6';
+$plugin->release = '0.9.7';
 
 $plugin->dependencies = array();
 
