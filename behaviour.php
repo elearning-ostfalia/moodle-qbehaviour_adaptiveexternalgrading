@@ -129,7 +129,7 @@ class qbehaviour_adaptiveexternalgrading extends qbehaviour_adaptive {
         return $status;
     }
 
-
+    // submit means pressing 'check' in form (or implicit submit)
     public function process_submit(question_attempt_pending_step $pendingstep, $compile = false) {
         $status = $this->process_save($pendingstep);
 
